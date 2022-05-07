@@ -333,6 +333,7 @@ const keyBoard = {
     })
     //Переключатель языка
     const buttons = document.querySelectorAll('.button');
+    
     let currentLanguage = 'en';
     document.body.addEventListener('keydown', (event) => {
 
@@ -352,21 +353,24 @@ const keyBoard = {
             const englishChar = buttonsMap[buttons[i].dataset.char].char.lowerCase.en;
             buttons[i].textContent = englishChar;
           }
-          currentLanguage = 'en'; b
+          currentLanguage = 'en'; 
 
         }
       }
 
     })
     //Введение символов в текстэрию
+    
+    
+  
     keyBoardWrapper.addEventListener('mousedown', (event) => {
-      textArea.value = buttonsMap[event.target.dataset.char].char.lowerCase.en;
+      if(event.target.classList.contains('button')){
+        textArea.setRangeText(buttonsMap[event.target.dataset.char].char.lowerCase[currentLanguage], textArea.selectionStart, textArea.selectionEnd, 'end')
+      }
+      
     })
   }
 }
-
-
-
 
 
 window.addEventListener('DOMContentLoaded', function () {
