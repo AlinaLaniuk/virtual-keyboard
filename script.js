@@ -133,10 +133,9 @@ const buttonsMap = {
     char: { lowerCase: { en: ']', ru: 'ъ' }, upperCase: { en: '}', ru: 'Ъ' } },
 
   },
-  Backslash: {
-    сode: 220,
-    char: { lowerCase: { en: '\\', ru: '\\' }, upperCase: { en: '|', ru: '/' } },
-
+  Delete: {
+    сode: 46,
+    char: { lowerCase: { en: 'del', ru: 'del' }, upperCase: { en: 'del', ru: 'del' } },
   },
   CapsLock: {
     сode: 20,
@@ -205,6 +204,11 @@ const buttonsMap = {
     сode: 16,
     char: { lowerCase: { en: 'shift', ru: 'shift' }, upperCase: { en: 'shift', ru: 'shift' } },
   },
+  Backslash: {
+    сode: 220,
+    char: { lowerCase: { en: '\\', ru: '\\' }, upperCase: { en: '|', ru: '/' } },
+
+  },
   KeyZ: {
     сode: 90,
     char: { lowerCase: { en: 'z', ru: 'я' }, upperCase: { en: 'Z', ru: 'Я' } },
@@ -255,18 +259,14 @@ const buttonsMap = {
     char: { lowerCase: { en: '/', ru: '.' }, upperCase: { en: '?', ru: ',' } },
 
   },
-  ShiftRight: {
-    сode: 16,
-    char: { lowerCase: { en: 'shift', ru: 'shift' }, upperCase: { en: 'shift', ru: 'shift' } },
-  },
+
   ArrowUp: {
     сode: 38,
     char: { lowerCase: { en: '△', ru: '△' }, upperCase: { en: '△', ru: '△' } },
-
   },
-  Delete: {
-    сode: 46,
-    char: { lowerCase: { en: 'del', ru: 'del' }, upperCase: { en: 'del', ru: 'del' } },
+  ShiftRight: {
+    сode: 16,
+    char: { lowerCase: { en: 'shift', ru: 'shift' }, upperCase: { en: 'shift', ru: 'shift' } },
   },
   ControlLeft: {
     сode: 17,
@@ -283,7 +283,6 @@ const buttonsMap = {
   Space: {
     сode: 32,
     char: { lowerCase: { en: ' ', ru: ' ' }, upperCase: { en: ' ', ru: ' ' } },
-
   },
   AltRight: {
     сode: 18,
@@ -326,17 +325,40 @@ const keyBoard = {
     const buttonsArray = Object.keys(buttonsMap);
     buttonsArray.forEach((keyName) => {
       const button = document.createElement('div');
-      button.classList.add('button');
-      button.textContent = buttonsMap[keyName].char.lowerCase.en;
       button.dataset.char = keyName;
+      button.classList.add('button');
+      if (keyName === 'Backspace') {
+        button.classList.add('backspace_button')
+      } else if (keyName === 'Tab') {
+        button.classList.add('tab_button')
+      } else if (keyName === 'Delete') {
+        button.classList.add('delete_button')
+      } else if (keyName === 'CapsLock') {
+        button.classList.add('capslock_and_leftshift_button')
+      } else if (keyName === 'Enter') {
+        button.classList.add('enter_button')
+      } else if (keyName === 'ShiftLeft') {
+        button.classList.add('capslock_and_leftshift_button')
+      } else if (keyName === 'ControlLeft') {
+        button.classList.add('control_button')
+      } else if (keyName === 'ControlRight') {
+        button.classList.add('control_button')
+      } else if (keyName === 'Space') {
+        button.classList.add('space_button')
+      } else if (keyName === 'OSLeft') {
+        button.classList.add('OSLeft_button')
+      }
+      button.textContent = buttonsMap[keyName].char.lowerCase.en;
       keyBoardWrapper.append(button);
     })
-    //Переключатель языка
+
     const buttons = document.querySelectorAll('.button');
-    
+
     let currentLanguage = 'en';
+    let currentCase = 'lowerCase';
     document.body.addEventListener('keydown', (event) => {
 
+      //Переключатель языка
       if (event.code === 'AltLeft' && event.shiftKey
         || event.code === 'ShiftLeft' && event.altKey
         || event.code === 'AltRight' && event.shiftKey
@@ -353,24 +375,103 @@ const keyBoard = {
             const englishChar = buttonsMap[buttons[i].dataset.char].char.lowerCase.en;
             buttons[i].textContent = englishChar;
           }
-          currentLanguage = 'en'; 
+          currentLanguage = 'en';
+
+        }
+      }
+      //Капитализация
+
+
+      // Введение символов в текстэрию по нажатию клавиши
+      if (buttonsMap[event.code]) {
+        event.preventDefault();
+        if (event.code === 'Backspace') {
+          if (textArea.selectionStart !== 0 && textArea.selectionStart === textArea.selectionEnd) {
+            textArea.setRangeText('', textArea.selectionStart - 1, textArea.selectionEnd, 'start')
+          } else {
+            textArea.setRangeText('', textArea.selectionStart, textArea.selectionEnd, 'start')
+          }
+        } else if (event.code === 'Tab') {
+          textArea.setRangeText('\t', textArea.selectionStart, textArea.selectionEnd, 'end')
+        } else if (event.code === 'Delete') {
+          if (textArea.selectionStart === textArea.selectionEnd) {
+            textArea.setRangeText('', textArea.selectionStart, textArea.selectionEnd + 1, 'start')
+          } else {
+            textArea.setRangeText('', textArea.selectionStart, textArea.selectionEnd, 'end')
+          }
+        } else if (event.code === 'Enter') {
+          textArea.setRangeText('\n', textArea.selectionStart, textArea.selectionEnd, 'end')
+        } else if (event.code === 'CapsLock') {
+          if (currentCase === 'lowerCase') {
+            for (let i = 0; i < buttons.length; i++) {
+              const upperCaseChar = buttonsMap[buttons[i].dataset.char].char.upperCase[currentLanguage];
+              buttons[i].textContent = upperCaseChar;
+            }
+            currentCase = 'upperCase';
+          } else if (currentCase === 'upperCase') {
+            for (let i = 0; i < buttons.length; i++) {
+              const lowerCaseChar = buttonsMap[buttons[i].dataset.char].char.lowerCase[currentLanguage];
+              buttons[i].textContent = lowerCaseChar;
+            }
+            currentCase = 'lowerCase';
+
+          }
+        } else {
+
+          textArea.setRangeText(buttonsMap[event.code].char[currentCase][currentLanguage], textArea.selectionStart, textArea.selectionEnd, 'end')
 
         }
       }
 
     })
-    //Введение символов в текстэрию
-    
-    
-  
+    //Введение символов в текстэрию по клику мыши
+
+
     keyBoardWrapper.addEventListener('mousedown', (event) => {
-      if(event.target.classList.contains('button')){
-        textArea.setRangeText(buttonsMap[event.target.dataset.char].char.lowerCase[currentLanguage], textArea.selectionStart, textArea.selectionEnd, 'end')
+      event.preventDefault();
+      if (event.target.classList.contains('button')) {
+        if (event.target.dataset.char === 'Backspace') {
+          if (textArea.selectionStart !== 0 && textArea.selectionStart === textArea.selectionEnd) {
+            textArea.setRangeText('', textArea.selectionStart - 1, textArea.selectionEnd, 'start')
+          } else {
+            textArea.setRangeText('', textArea.selectionStart, textArea.selectionEnd, 'start')
+          }
+        } else if (event.target.dataset.char === 'Tab') {
+          textArea.setRangeText('\t', textArea.selectionStart, textArea.selectionEnd, 'end')
+        } else if (event.target.dataset.char === 'Delete') {
+          if (textArea.selectionStart === textArea.selectionEnd) {
+            textArea.setRangeText('', textArea.selectionStart, textArea.selectionEnd + 1, 'start')
+          } else {
+            textArea.setRangeText('', textArea.selectionStart, textArea.selectionEnd, 'end')
+          }
+        } else if (event.target.dataset.char === 'Enter') {
+          textArea.setRangeText('\n', textArea.selectionStart, textArea.selectionEnd, 'end')
+        } else if (event.target.dataset.char === 'AltLeft' || event.target.dataset.char === 'AltRight' || event.target.dataset.char === 'OSLeft' || event.target.dataset.char === 'ControlRight' || event.target.dataset.char === 'ControlLeft') {
+          textArea.setSelectionRange(textArea.selectionStart, textArea.selectionEnd);
+        } else if (event.target.dataset.char === 'CapsLock') {
+            if (currentCase === 'lowerCase') {
+              for (let i = 0; i < buttons.length; i++) {
+                const upperCaseChar = buttonsMap[buttons[i].dataset.char].char.upperCase[currentLanguage];
+                buttons[i].textContent = upperCaseChar;
+              }
+              currentCase = 'upperCase';
+            } else if (currentCase === 'upperCase') {
+              for (let i = 0; i < buttons.length; i++) {
+                const lowerCaseChar = buttonsMap[buttons[i].dataset.char].char.lowerCase[currentLanguage];
+                buttons[i].textContent = lowerCaseChar;
+              }
+              currentCase = 'lowerCase';
+
+            }
+        } else {
+          textArea.setRangeText(buttonsMap[event.target.dataset.char].char[currentCase][currentLanguage], textArea.selectionStart, textArea.selectionEnd, 'end')
+        }
       }
-      
     })
+
   }
 }
+
 
 
 window.addEventListener('DOMContentLoaded', function () {
