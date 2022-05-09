@@ -46,9 +46,10 @@ body{
     justify-content: center;
     font-size: 25px;
     font-family:sans-serif;
+    transition: all 0.2s;
     
 }
-.OSLeft_button{
+.metaLeft_button{
     font-size: 22px;
 }
 .backspace_button{
@@ -71,4 +72,9 @@ body{
 }
 .space_button{
     width: 455px;
+}
+.button_active{
+    background-color: rgb(246, 136, 252);
+    transform: scale(0.9);
+    /* transform-origin: center; */
 }
