@@ -373,11 +373,15 @@ class KeyBoard {
         }
       }
     });
-
+    const mouseoutHandler = (mouseoutEvent) => {
+      mouseoutEvent.currentTarget.classList.remove('button_active');
+      mouseoutEvent.currentTarget.removeEventListener('mouseout', mouseoutHandler);
+    };
     keyBoardWrapper.addEventListener('mousedown', (event) => {
       event.preventDefault();
       if (event.target.classList.contains('button')) {
         event.target.classList.add('button_active');
+        event.target.addEventListener('mouseout', mouseoutHandler);
         if (event.target.dataset.keyName === 'Backspace') {
           if (textArea.selectionStart !== 0 && textArea.selectionStart === textArea.selectionEnd) {
             textArea.setRangeText('', textArea.selectionStart - 1, textArea.selectionEnd, 'start');
